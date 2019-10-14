@@ -18,14 +18,17 @@ search_fields = [
     'ad_delivery_start_time',
     'ad_delivery_stop_time',
     'ad_creative_body',
+    'ad_creative_link_title',
+    'ad_creative_link_caption',
+    'ad_creative_link_description',
     'page_id',
     'page_name',
     'currency',
-    'spend',
-    'demographic_distribution',
+    'spend',  # returns range in dict
+    'demographic_distribution',  # returns list of dicts
     'funding_entity',
-    'impressions',
-    'region_distribution',
+    'impressions',  # returns range in dict
+    'region_distribution',  # returns list of dicts
 ]
 search_fields = ', '.join(search_fields)
 
