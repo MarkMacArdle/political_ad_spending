@@ -2,6 +2,7 @@ import json
 import logging
 import os
 
+import jsonlines
 import requests
 
 from config import access_token, output_folder_name, search_fields
@@ -47,25 +48,30 @@ params = {
 }
 url = "https://graph.facebook.com/v4.0/ads_archive"
 
-counter = 1
-total_ads = 0
+loop_counter = 1
+ad_counter = 1
 while True:
     logging.info(
-        f'Starting loop {counter}, getting next {results_per_page} results'
+        f'Starting loop {loop_counter}, getting next {results_per_page} results'
     )
     response = requests.get(url=url, params=params).json()
     data = response['data']
-    fname = f'{counter:06}.json'
-    logging.info(f'Found {len(data)} ads, saving to {fname}')
+    for ad in data:
+        # Facebook doesn't provide a unique ID for ads so add one for later use
+        ad['id'] = ad_counter
+        ad_counter += 1
 
     create_folder_if_needed(output_folder_name)
-    with open(f'{output_folder_name}/{fname}', mode='w') as outfile:
-        json.dump(data, outfile)
+    fname = f'{loop_counter:06}.jsonl'
+    logging.info(f'Found {len(data)} ads, saving to {fname}')
+
+    # write in json lines format that is accepted by BigQuery
+    with jsonlines.open(f'{output_folder_name}/{fname}', 'w') as writer:
+        writer.write_all(data)
 
     params = None
-    counter += 1
-    total_ads += len(data)
-    logging.info(f'{total_ads} saved so far')
+    loop_counter += 1
+    logging.info(f'{ad_counter} saved so far')
 
     url = get_next_url(response)
     if not url:
