@@ -1,8 +1,11 @@
 import json
+import logging
+import os
+from datetime import datetime
 
 import requests
 
-import config
+from config import access_token, output_folder_name, search_fields
 
 
 def get_next_url(fb_response):
@@ -15,14 +18,25 @@ def get_next_url(fb_response):
 
     next_url = fb_response.get('paging')
     if next_url:
-        next_url = next_url.get('next')
-
-    return next_url
+        return next_url.get('next')
 
 
-access_token = config.user_access_token_extended_expiry
-url = "https://graph.facebook.com/v4.0/ads_archive"
-search_fields = ', '.join(config.search_fields)
+def create_folder_if_needed(folder_name):
+    """Creates folder if it doesn't exist already"""
+
+    if not os.path.exists(folder_name):
+        os.mkdir(folder_name)
+        logging.info(f'Created folder: {folder_name}')
+
+
+# So info logs are printed when run locally
+logging.basicConfig(level=logging.INFO)
+
+# max value from docs is 5000 but found you get an error saying you've asked
+# for too much data when you try that.
+results_per_page = 1000
+
+search_fields = ', '.join(search_fields)
 params = {
     'search_terms': "''",
     'ad_type': 'POLITICAL_AND_ISSUE_ADS',
@@ -30,25 +44,32 @@ params = {
     'access_token': access_token,
     'fields': search_fields,
     'ad_active_status': 'ALL',
-    'limit': 10,
+    'limit': results_per_page,
 }
+url = "https://graph.facebook.com/v4.0/ads_archive"
 
-# todo: use paging['next'] url to keep getting more data until it's not present
-# or blank
-# useful post
-# http://rpubs.com/zoowalk/FB_EP2019
+counter = 1
+total_ads = 0
+while True:
+    logging.info(
+        f'Starting loop {counter}, getting next {results_per_page} results'
+    )
+    response = requests.get(url=url, params=params).json()
+    data = response['data']
+    fname = f'{counter:06}.json'
+    logging.info(f'Found {len(data)} ads, saving to {fname}')
 
+    create_folder_if_needed(output_folder_name)
+    with open(f'{output_folder_name}/{fname}', mode='w') as outfile:
+        json.dump(data, outfile)
 
-res = requests.get(url=url, params=params)
-response = res.json()
-next_page_url = get_next_url(response)
+    params = None
+    counter += 1
+    total_ads += len(data)
+    logging.info(f'{total_ads} saved so far')
 
-while next_page_url:
+    url = get_next_url(response)
+    if not url:
+        break
 
-
-
-print(json.dumps(response, indent=4, default=str))
-import pdb; pdb.set_trace()
-
-
-
+logging.info('No more pages found for results. Ending now.')

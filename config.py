@@ -16,6 +16,8 @@ search_fields = [
     'region_distribution',  # returns list of dicts
 ]
 
+output_folder_name = 'ad_data'
+
 # After you've registered as a developer and set up an app use the graph api
 # to get a new token:
 #       https://developers.facebook.com/tools/explorer
@@ -24,4 +26,4 @@ search_fields = [
 #       https://developers.facebook.com/tools/debug/accesstoken
 # Helpful post on getting access tokens:
 #       https://medium.com/@DrGabrielA81/python-how-making-facebook-api-calls-using-facebook-sdk-ea18bec973c8#6fdb
-user_access_token_extended_expiry = 'your token here'
+access_token = ''
