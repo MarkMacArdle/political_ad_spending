@@ -16,11 +16,12 @@ search_fields = [
     'region_distribution',  # returns list of dicts
 ]
 
-# Use the graph api to get a new token
+# After you've registered as a developer and set up an app use the graph api
+# to get a new token:
 #       https://developers.facebook.com/tools/explorer
 # That token will expire in about an hour so use the debugger to extend it and
-# up to two months.
+# up to two months:
 #       https://developers.facebook.com/tools/debug/accesstoken
-# helpful post on getting access tokens:
+# Helpful post on getting access tokens:
 #       https://medium.com/@DrGabrielA81/python-how-making-facebook-api-calls-using-facebook-sdk-ea18bec973c8#6fdb
 user_access_token_extended_expiry = 'your token here'
