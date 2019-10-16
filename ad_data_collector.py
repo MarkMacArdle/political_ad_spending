@@ -4,35 +4,26 @@ import requests
 
 import config
 
-# Use the graph api to get a new token
-#       https://developers.facebook.com/tools/explorer
-# That token will expire in about an hour so use the debugger to extend it and
-# up to two months.
-#       https://developers.facebook.com/tools/debug/accesstoken
-# helpful post on getting access tokens:
-#       https://medium.com/@DrGabrielA81/python-how-making-facebook-api-calls-using-facebook-sdk-ea18bec973c8#6fdb
+
+def get_next_url(fb_response):
+    """
+    Returns url to next page of ad results
+
+    :param fb_response: response from facebook ad library api
+    :return: url to next page of results or None if url not found
+    """
+
+    next_url = fb_response.get('paging')
+    if next_url:
+        next_url = next_url.get('next')
+
+    return next_url
+
+
 access_token = config.user_access_token_extended_expiry
-
-search_fields = [
-    'ad_creation_time',
-    'ad_delivery_start_time',
-    'ad_delivery_stop_time',
-    'ad_creative_body',
-    'ad_creative_link_title',
-    'ad_creative_link_caption',
-    'ad_creative_link_description',
-    'page_id',
-    'page_name',
-    'currency',
-    'spend',  # returns range in dict
-    'demographic_distribution',  # returns list of dicts
-    'funding_entity',
-    'impressions',  # returns range in dict
-    'region_distribution',  # returns list of dicts
-]
-search_fields = ', '.join(search_fields)
-
-data = {
+url = "https://graph.facebook.com/v4.0/ads_archive"
+search_fields = ', '.join(config.search_fields)
+params = {
     'search_terms': "''",
     'ad_type': 'POLITICAL_AND_ISSUE_ADS',
     'ad_reached_countries': 'GB',
@@ -42,14 +33,20 @@ data = {
     'limit': 10,
 }
 
-url = "https://graph.facebook.com/v4.0/ads_archive"
-
 # todo: use paging['next'] url to keep getting more data until it's not present
 # or blank
 # useful post
 # http://rpubs.com/zoowalk/FB_EP2019
-res = requests.get(url=url, params=data)
+
+
+res = requests.get(url=url, params=params)
 response = res.json()
+next_page_url = get_next_url(response)
+
+while next_page_url:
+
+
+
 print(json.dumps(response, indent=4, default=str))
 import pdb; pdb.set_trace()
 
