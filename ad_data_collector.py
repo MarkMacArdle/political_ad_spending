@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 
@@ -56,48 +55,53 @@ def encode_ads(ad_data, counter):
     return ad_data, counter
 
 
-# So info logs are printed when run locally
-logging.basicConfig(level=logging.INFO)
+def get_and_save_ad_data():
+    """
+    Call facebook api for political ads and save them in newline
+    delimited json files in batches of 1000.
+    """
+    # So info logs are printed when run locally
+    logging.basicConfig(level=logging.INFO)
 
-# max value from docs is 5000 but found you get an error saying you've asked
-# for too much data when you try that.
-results_per_page = 1000
+    # max value from docs is 5000 but found you get an error saying you've
+    # asked for too much data when you try that.
+    results_per_page = 1000
 
-search_fields_joined = ', '.join(search_fields)
-params = {
-    'search_terms': "''",
-    'ad_type': 'POLITICAL_AND_ISSUE_ADS',
-    'ad_reached_countries': 'GB',
-    'access_token': access_token,
-    'fields': search_fields_joined,
-    'ad_active_status': 'ALL',
-    'limit': results_per_page,
-}
-url = "https://graph.facebook.com/v4.0/ads_archive"
+    search_fields_joined = ', '.join(search_fields)
+    params = {
+        'search_terms': "''",
+        'ad_type': 'POLITICAL_AND_ISSUE_ADS',
+        'ad_reached_countries': 'GB',
+        'access_token': access_token,
+        'fields': search_fields_joined,
+        'ad_active_status': 'ALL',
+        'limit': results_per_page,
+    }
+    url = "https://graph.facebook.com/v4.0/ads_archive"
 
-loop_counter = 1
-ad_counter = 1
-while True:
-    logging.info(
-        f'Starting loop {loop_counter}, getting next {results_per_page} results'
-    )
-    response = requests.get(url=url, params=params).json()
-    data, ad_counter = encode_ads(response['data'], ad_counter)
+    loop_counter = 1
+    ad_counter = 1
+    while True:
+        logging.info(
+            f'Starting loop {loop_counter}, getting next {results_per_page} results'
+        )
+        response = requests.get(url=url, params=params).json()
+        data, ad_counter = encode_ads(response['data'], ad_counter)
 
-    create_folder_if_needed(output_folder_name)
-    fname = f'{loop_counter:06}.jsonl'
-    logging.info(f'Found {len(data)} ads, saving to {fname}')
+        create_folder_if_needed(output_folder_name)
+        fname = f'{loop_counter:06}.jsonl'
+        logging.info(f'Found {len(data)} ads, saving to {fname}')
 
-    # write in json lines format that is accepted by BigQuery
-    with jsonlines.open(f'{output_folder_name}/{fname}', 'w') as writer:
-        writer.write_all(data)
+        # write in json lines format that is accepted by BigQuery
+        with jsonlines.open(f'{output_folder_name}/{fname}', 'w') as writer:
+            writer.write_all(data)
 
-    params = None
-    loop_counter += 1
-    logging.info(f'{ad_counter} saved so far')
+        params = None
+        loop_counter += 1
+        logging.info(f'{ad_counter} saved so far')
 
-    url = get_next_url(response)
-    if not url or loop_counter > 3:
-        break
+        url = get_next_url(response)
+        if not url or loop_counter > 3:
+            break
 
-logging.info('No more pages found for results. Ending now.')
+    logging.info('No more pages found for results. Ending now.')

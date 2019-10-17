@@ -26,4 +26,4 @@ output_folder_name = 'ad_data'
 #       https://developers.facebook.com/tools/debug/accesstoken
 # Helpful post on getting access tokens:
 #       https://medium.com/@DrGabrielA81/python-how-making-facebook-api-calls-using-facebook-sdk-ea18bec973c8#6fdb
-access_token = ''
+access_token = 'EAAPaWGvcZCGoBACBBEBgtNCXZCRXSC4MeCLedRvMWnOrEtVxowSbQLnNnaXwY87sHnxhX6GZCPf38uAVxcjq0IClvhFgOGdpeRnZCYtHAp0TuXRqC7gKYwrYbMZAnRfpHbJtOx2yZCvu4ZCcN0ZB9n8t7kvNCpeVGkPcm0vTZCKfuFwZDZD'
