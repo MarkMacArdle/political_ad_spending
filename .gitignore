@@ -1,4 +1,6 @@
 .idea/
 __pycache__/
-ad_data/
+ad_data*/
 credentials/
+set_env_vars.sh
+deploy.sh

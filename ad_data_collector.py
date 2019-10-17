@@ -29,6 +29,33 @@ def create_folder_if_needed(folder_name):
         logging.info(f'Created folder: {folder_name}')
 
 
+def encode_ads(ad_data, counter):
+    """Encode ads into a standard format that suits BigQuery"""
+
+    datetime_fields = [
+        'ad_creation_time',
+        'ad_delivery_start_time',
+        'ad_delivery_stop_time',
+    ]
+
+    for ad in ad_data:
+        # Facebook doesn't provide a unique ID for ads so add one
+        ad['id'] = counter
+        counter += 1
+
+        for field in search_fields:
+            # If a field isn't present add it with a null value
+            if field not in ad.keys():
+                ad[field] = None
+
+            # Timestamps start in a format like '2019-10-09T16:36:35+0000'
+            # BigQuery wants a format like '2019-10-09 16:36:35'
+            if field in datetime_fields and ad[field] is not None:
+                ad[field] = ad[field].replace('T', ' ').split('+')[0]
+
+    return ad_data, counter
+
+
 # So info logs are printed when run locally
 logging.basicConfig(level=logging.INFO)
 
@@ -36,13 +63,13 @@ logging.basicConfig(level=logging.INFO)
 # for too much data when you try that.
 results_per_page = 1000
 
-search_fields = ', '.join(search_fields)
+search_fields_joined = ', '.join(search_fields)
 params = {
     'search_terms': "''",
     'ad_type': 'POLITICAL_AND_ISSUE_ADS',
     'ad_reached_countries': 'GB',
     'access_token': access_token,
-    'fields': search_fields,
+    'fields': search_fields_joined,
     'ad_active_status': 'ALL',
     'limit': results_per_page,
 }
@@ -55,11 +82,7 @@ while True:
         f'Starting loop {loop_counter}, getting next {results_per_page} results'
     )
     response = requests.get(url=url, params=params).json()
-    data = response['data']
-    for ad in data:
-        # Facebook doesn't provide a unique ID for ads so add one for later use
-        ad['id'] = ad_counter
-        ad_counter += 1
+    data, ad_counter = encode_ads(response['data'], ad_counter)
 
     create_folder_if_needed(output_folder_name)
     fname = f'{loop_counter:06}.jsonl'
@@ -74,7 +97,7 @@ while True:
     logging.info(f'{ad_counter} saved so far')
 
     url = get_next_url(response)
-    if not url:
+    if not url or loop_counter > 3:
         break
 
 logging.info('No more pages found for results. Ending now.')
