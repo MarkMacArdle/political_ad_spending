@@ -10,7 +10,6 @@ requests = "*"
 facebook-sdk = "*"
 jsonlines = "*"
 python-dateutil = "*"
-apache-airflow = "*"
 google-cloud-bigquery = "*"
 
 [requires]

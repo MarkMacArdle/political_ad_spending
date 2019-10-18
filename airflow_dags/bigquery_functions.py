@@ -91,53 +91,48 @@ def load_data_into_table(client, staging_table):
 
         errors = client.insert_rows(staging_table, rows)
         if errors:
-            logging.error(errors)
+            raise Exception(
+                f'Errors found when loading data into staging table: {errors}'
+            )
 
 
 def create_and_load_staging_table(**kwargs):
     """Create the staging table in BigQuery and load the ad data into it"""
 
     client = bigquery.Client()
-    dataset = client.dataset(kwargs['dataset_name'])
+
+    dataset = client.dataset(kwargs['params']['dataset_name'][0])
     staging_table = create_staging_table(
         client,
         dataset,
-        kwargs['staging_table_name'],
+        kwargs['params']['staging_table_name'][0],
     )
     load_data_into_table(client, staging_table)
 
 
-def load_data_into_working_tables(**kwargs):
+def load_data_into_working_table(**kwargs):
     client = bigquery.Client()
-    staging_table = client.get_table(
-        f'{kwargs["dataset_name"]}.{kwargs["staging_table_name"]}'
+
+    job_config = bigquery.QueryJobConfig()
+    table_ref = client.dataset(kwargs['params']['dataset_name'][0]).table(
+        kwargs['params']['table_name'][0]
+    )
+    job_config.destination = table_ref
+    logging.info(kwargs)
+    logging.info(f"sql query: {kwargs['params']['sql']}")
+
+    # Start the query
+    query_job = client.query(
+        # unlike other params don't need to take first index, I think because
+        # this is a triple quoted string.
+        kwargs['params']['sql'],
+        location='EU',
+        job_config=job_config
     )
 
-    load_data_into_table(client, staging_table)
-
-    tables_and_load_queries = {
-        'ads': sql_ads_table,
-        'spends': sql_spend_table,
-        'demographics': sql_demographics_table,
-        'impressions': sql_impressions_table,
-        'regions': sql_regions_table,
-    }
-
-    for table_name, sql in tables_and_load_queries:
-        job_config = bigquery.QueryJobConfig()
-        table_ref = client.dataset(kwargs["dataset_name"]).table(table_name)
-        job_config.destination = table_ref
-
-        # Start the query
-        query_job = client.query(
-            sql.format(kwargs["staging_table_path"]),
-            location='EU',
-            job_config=job_config
-        )
-
-        # Wait for the query to finish
-        query_job.result()
-        logging.info(f'Query results loaded to table {table_ref.path}')
+    # Wait for the query to finish
+    query_job.result()
+    logging.info(f'Query results loaded to table {table_ref.path}')
 
 
 def check_rows_in_table(**kwargs):
@@ -145,14 +140,15 @@ def check_rows_in_table(**kwargs):
 
     client = bigquery.Client()
     query_job = client.query(sql_count_table_rows.format(
-        id_col=kwargs['id_col'],
-        project=kwargs['project_name'],
-        dataset=kwargs['dataset_name'],
-        table=kwargs['table_name'],
+        project=kwargs['params']['project_name'][0],
+        dataset=kwargs['params']['dataset_name'][0],
+        table=kwargs['params']['table_name'][0],
     ))
 
     results = query_job.result()
     row_count = list(results)[0][0]
 
     if row_count == 0:
-        raise Exception(f'No rows found in table {kwargs["table_name"]}')
+        raise Exception(
+            f'No rows found in {kwargs["params"]["table_name"][0]}'
+        )
