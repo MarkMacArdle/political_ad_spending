@@ -5,14 +5,23 @@ Facebook's [Ad Library API](https://www.facebook.com/ads/library/api/). The
 purpose of this to allow analysis of who is running what
 ads, how much they're spending and what demographics they're targeting.
 
-Once ads are pulled from the API they're uploaded into a staging table in 
-Google BigQuery and then unnested and loaded into more accessible tables in 
-a snowflake schema. Apache Airflow is used to run the processing pipeline.
+Once ads are pulled from the API they're uploaded into database tables and
+then unnested and loaded into more accessible tables in a snowflake schema.
 
 Data about the UK population and Facebook users by age group is also uploaded.
 
 Data for over 100,000 ads is available and when the nested demographic data 
 is extracted this gives well over 1m rows of data to work with.
+
+
+# Tools used
+
+The pipeline is run with Apache Airflow. Google Cloud Composer, which offers
+ a managed environment (you don't have to worry about handling VM crashes), 
+ was used to run Airflow. 
+ 
+Data is uploaded into Google BigQuery. A data warehouse made for handling 
+huge amounts of data.
   
 
 # Set up
