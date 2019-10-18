@@ -16,7 +16,8 @@ SELECT
   spend.upper_bound * demos.percentage AS spend_upper_bound,
   (spend.lower_bound + spend.upper_bound / 2) * demos.percentage AS spend_midpoint,
   spend.lower_bound * demos.percentage AS spend_lower_bound,
-  currency
+  currency,
+  funding_entity
 FROM `{staging_table_path}`
 CROSS JOIN UNNEST(demographic_distribution) AS demos
 """
@@ -79,7 +80,8 @@ SELECT
   spend.upper_bound * regions.percentage AS spend_upper_bound,
   (spend.lower_bound + spend.upper_bound / 2) * regions.percentage AS spend_midpoint,
   spend.lower_bound * regions.percentage AS spend_lower_bound,
-  currency
+  currency,
+  funding_entity
 FROM `{staging_table_path}`
 CROSS JOIN UNNEST(region_distribution) AS regions
 """

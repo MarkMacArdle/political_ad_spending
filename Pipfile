@@ -11,6 +11,7 @@ facebook-sdk = "*"
 jsonlines = "*"
 python-dateutil = "*"
 google-cloud-bigquery = "*"
+gcsfs = "*"
 
 [requires]
 python_version = "3.7"

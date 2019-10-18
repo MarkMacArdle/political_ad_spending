@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cbe47fbcad5b67bca6d761112116a6400981aa9730518212343290954b7f18e0"
+            "sha256": "14dde8462ee5f3d9b10a91599ed9ed09e850fe41e2888d88b4e237b55c6d2dab"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -37,6 +37,13 @@
             ],
             "version": "==3.0.4"
         },
+        "decorator": {
+            "hashes": [
+                "sha256:86156361c50488b84a3f148056ea716ca587df2f0de1d34750d35c21312725de",
+                "sha256:f069f3a01830ca754ba5258fde2278454a0b5b79e0d7f5c13b3b97e57d4acff6"
+            ],
+            "version": "==4.4.0"
+        },
         "facebook-sdk": {
             "hashes": [
                 "sha256:2e987b3e0f466a6f4ee77b935eb023dba1384134f004a2af21f1cfff7fe0806e",
@@ -44,6 +51,19 @@
             ],
             "index": "pypi",
             "version": "==3.1.0"
+        },
+        "fsspec": {
+            "hashes": [
+                "sha256:6531a5fa9ea6bf27a5180d225558a8a7aa5d7c3cbf7e8b146dd37ac699017937"
+            ],
+            "version": "==0.5.2"
+        },
+        "gcsfs": {
+            "hashes": [
+                "sha256:63e2ee5ec7c296dd851bac07c25ff7d53c7d9919adb3943799e05467e9a595c4"
+            ],
+            "index": "pypi",
+            "version": "==0.3.1"
         },
         "google-api-core": {
             "hashes": [
@@ -58,6 +78,13 @@
                 "sha256:20705f6803fd2c4d1cc2dcb0df09d4dfcb9a7d51fd59e94a3a28231fd93119ed"
             ],
             "version": "==1.6.3"
+        },
+        "google-auth-oauthlib": {
+            "hashes": [
+                "sha256:88d2cd115e3391eb85e1243ac6902e76e77c5fe438b7276b297fbe68015458dd",
+                "sha256:a92a0f6f41a0fb6138454fbc02674e64f89d82a244ea32f98471733c8ef0e0e1"
+            ],
+            "version": "==0.4.1"
         },
         "google-cloud-bigquery": {
             "hashes": [
@@ -101,6 +128,13 @@
             ],
             "index": "pypi",
             "version": "==1.2.0"
+        },
+        "oauthlib": {
+            "hashes": [
+                "sha256:bee41cc35fcca6e988463cacc3bcb8a96224f470ca547e697b604cc697b2f889",
+                "sha256:df884cd6cbe20e32633f1db1072e9356f53638e4361bef4e8b03c9127c9328ea"
+            ],
+            "version": "==3.1.0"
         },
         "protobuf": {
             "hashes": [
@@ -159,6 +193,13 @@
             ],
             "index": "pypi",
             "version": "==2.22.0"
+        },
+        "requests-oauthlib": {
+            "hashes": [
+                "sha256:bd6533330e8748e94bf0b214775fed487d309b8b8fe823dc45641ebcd9a32f57",
+                "sha256:d3ed0c8f2e3bbc6b344fa63d6f933745ab394469da38db16bdddb461c7e25140"
+            ],
+            "version": "==1.2.0"
         },
         "rsa": {
             "hashes": [

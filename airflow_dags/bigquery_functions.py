@@ -2,7 +2,8 @@ import logging
 import os
 
 import jsonlines
-from google.cloud import bigquery
+import pandas
+from google.cloud import bigquery, storage
 
 from sql_queries import sql_ads_table, sql_spend_table, \
     sql_impressions_table, sql_regions_table, sql_demographics_table, \
@@ -101,31 +102,31 @@ def create_and_load_staging_table(**kwargs):
 
     client = bigquery.Client()
 
-    dataset = client.dataset(kwargs['params']['dataset_name'][0])
+    dataset = client.dataset(kwargs['params']['dataset_name'])
     staging_table = create_staging_table(
         client,
         dataset,
-        kwargs['params']['staging_table_name'][0],
+        kwargs['params']['staging_table_name'],
     )
     load_data_into_table(client, staging_table)
 
 
 def load_data_into_working_table(**kwargs):
+    """Run a query on the staging table and save the result to a new table"""
+
     client = bigquery.Client()
 
     job_config = bigquery.QueryJobConfig()
-    table_ref = client.dataset(kwargs['params']['dataset_name'][0]).table(
-        kwargs['params']['table_name'][0]
+    table_ref = client.dataset(kwargs['params']['dataset_name']).table(
+        kwargs['params']['table_name']
     )
     job_config.destination = table_ref
-    logging.info(kwargs)
-    logging.info(f"sql query: {kwargs['params']['sql']}")
 
     # Start the query
     query_job = client.query(
-        # unlike other params don't need to take first index, I think because
-        # this is a triple quoted string.
-        kwargs['params']['sql'],
+        kwargs['params']['sql'].format(
+            staging_table_path=kwargs['params']['staging_table_path']
+        ),
         location='EU',
         job_config=job_config
     )
@@ -139,10 +140,11 @@ def check_rows_in_table(**kwargs):
     """Check the passed table has at least one row, raise error if not"""
 
     client = bigquery.Client()
+
     query_job = client.query(sql_count_table_rows.format(
-        project=kwargs['params']['project_name'][0],
-        dataset=kwargs['params']['dataset_name'][0],
-        table=kwargs['params']['table_name'][0],
+        project=kwargs['params']['project_name'],
+        dataset=kwargs['params']['dataset_name'],
+        table=kwargs['params']['table_name'],
     ))
 
     results = query_job.result()
@@ -150,5 +152,7 @@ def check_rows_in_table(**kwargs):
 
     if row_count == 0:
         raise Exception(
-            f'No rows found in {kwargs["params"]["table_name"][0]}'
+            f'No rows found in {kwargs["params"]["table_name"]}'
         )
+
+    logging.info(f'Found {row_count} rows.')

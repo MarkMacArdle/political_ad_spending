@@ -14,32 +14,19 @@ from sql_queries import sql_ads_table, sql_spend_table, \
     sql_regions_impressions_spend_table
 
 
-project_name = 'bbm-data-lake-prod',
-dataset_name = 'markm_udacity_project2',
-
-# Unsure why but variables passed to operators become tuples so need to
-# select first index when using.
-bash_setup_command = f'bq mk {dataset_name[0]}'
-staging_table_name = 'staging_table',
+project_name = 'bbm-data-lake-prod'
+dataset_name = 'markm_udacity_project3'
+staging_table_name = 'staging_table'
 staging_table_path = f'{project_name}.{dataset_name}.{staging_table_name}'
 tables_and_load_queries = {
-    'ads': sql_ads_table.format(staging_table_path=staging_table_path),
-    'spends': sql_spend_table.format(staging_table_path=staging_table_path),
-    'demographics': sql_demographics_table.format(
-        staging_table_path=staging_table_path
-    ),
+    'ads': sql_ads_table,
+    'spends': sql_spend_table,
+    'demographics': sql_demographics_table,
     'demographics_impressions_spend_joined':
-        sql_demographics_impressions_spend_table.format(
-            staging_table_path=staging_table_path
-        ),
-    'impressions': sql_impressions_table.format(
-        staging_table_path=staging_table_path
-    ),
-    'regions': sql_regions_table.format(staging_table_path=staging_table_path),
-    'regions_impressions_spend_joined':
-        sql_regions_impressions_spend_table.format(
-            staging_table_path=staging_table_path
-        ),
+        sql_demographics_impressions_spend_table,
+    'impressions': sql_impressions_table,
+    'regions': sql_regions_table,
+    'regions_impressions_spend_joined': sql_regions_impressions_spend_table,
 }
 
 default_args = {
@@ -54,7 +41,7 @@ with DAG(dag_id='facebook_political_ads_to_bigquery_v1',
 
     create_dataset = BashOperator(
         task_id='create_dataset',
-        bash_command=bash_setup_command,
+        bash_command=f'bq --location=EU mk {dataset_name}',
     )
 
     get_facebook_ads = PythonOperator(
@@ -95,6 +82,7 @@ with DAG(dag_id='facebook_political_ads_to_bigquery_v1',
                 'sql': sql,
                 'dataset_name': dataset_name,
                 'table_name': table_name,
+                'staging_table_path': staging_table_path,
             }
         )
 
