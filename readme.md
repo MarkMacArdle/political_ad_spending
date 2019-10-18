@@ -142,7 +142,12 @@ This would be changed to saving to Google Cloud Storage.
 The pipelines would be run on a daily basis by 7 am every day.
 
 - This would be done by changing the `schedule_interval` DAG variable in 
-Airflow to a cron string of `0 7 * * *`
+Airflow to a cron string of `0 7 * * *`. 
+- To avoid duplicates in the BigQuery tables an extra it would be useful to 
+add a step checking if ad's have an `ad_creation_time` since the last run 
+and only upload the new ones. Facebook unfortunately doesn't provide any way
+of filtering for ads updated in a date range so all ads would have to be 
+iterated over.
 
 The database needed to be accessed by 100+ people.
 
