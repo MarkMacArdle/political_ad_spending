@@ -2,13 +2,9 @@ import logging
 import os
 
 import jsonlines
-import pandas
-from google.cloud import bigquery, storage
+from google.cloud import bigquery
 
-from sql_queries import sql_ads_table, sql_spend_table, \
-    sql_impressions_table, sql_regions_table, sql_demographics_table, \
-    sql_count_table_rows
-
+from ad_data_collector import get_and_save_ad_data
 
 def create_staging_table(client, dataset_ref, table_name):
     """Create staging table in BigQuery and return it as an object"""
@@ -111,48 +107,11 @@ def create_and_load_staging_table(**kwargs):
     load_data_into_table(client, staging_table)
 
 
-def load_data_into_working_table(**kwargs):
-    """Run a query on the staging table and save the result to a new table"""
-
-    client = bigquery.Client()
-
-    job_config = bigquery.QueryJobConfig()
-    table_ref = client.dataset(kwargs['params']['dataset_name']).table(
-        kwargs['params']['table_name']
-    )
-    job_config.destination = table_ref
-
-    # Start the query
-    query_job = client.query(
-        kwargs['params']['sql'].format(
-            staging_table_path=kwargs['params']['staging_table_path']
-        ),
-        location='EU',
-        job_config=job_config
-    )
-
-    # Wait for the query to finish
-    query_job.result()
-    logging.info(f'Query results loaded to table {table_ref.path}')
-
-
-def check_rows_in_table(**kwargs):
-    """Check the passed table has at least one row, raise error if not"""
-
-    client = bigquery.Client()
-
-    query_job = client.query(sql_count_table_rows.format(
-        project=kwargs['params']['project_name'],
-        dataset=kwargs['params']['dataset_name'],
-        table=kwargs['params']['table_name'],
-    ))
-
-    results = query_job.result()
-    row_count = list(results)[0][0]
-
-    if row_count == 0:
-        raise Exception(
-            f'No rows found in {kwargs["params"]["table_name"]}'
-        )
-
-    logging.info(f'Found {row_count} rows.')
+def get_ads_and_upload_to_bq_staging(**kwargs):
+    """
+    Wrapper function so both the getting and uploading of ads is done on
+    the one node and so the local file system can be used to store the ads
+    before upload
+    """
+    get_and_save_ad_data()
+    create_and_load_staging_table(**kwargs)

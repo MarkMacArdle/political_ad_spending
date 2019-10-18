@@ -60,6 +60,7 @@ def get_and_save_ad_data():
     Call facebook api for political ads and save them in newline
     delimited json files in batches of 1000.
     """
+
     # So info logs are printed when run locally
     logging.basicConfig(level=logging.INFO)
 

@@ -16,3 +16,14 @@ You'll need to:
 Further details [here](https://cloud.google.com/docs/authentication/getting-started) 
 if needed.
 
+
+# Data Sources
+
+- Facebook Ad Library
+- `guardian_facebook_users_2018.csv` is from 
+this [Guardian article](https://www.theguardian.com/technology/2018/feb/12/is-facebook-for-old-people-over-55s-flock-in-as-the-young-leave) on 
+Facebook users.
+- `ons_uk_population_estimates_from_2016_for_2019.csv` is from the UK Office
+ of National Statistics and available [here](https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/tablea11principalprojectionuksummary).
+
+
