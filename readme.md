@@ -22,6 +22,9 @@ The pipeline is run with Apache Airflow. Google Cloud Composer, which offers
  
 Data is uploaded into Google BigQuery. A data warehouse made for handling 
 huge amounts of data.
+
+DAG created in Airflow:
+![airflow_dag](airflow_dag.png)
   
 
 # Set up
