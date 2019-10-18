@@ -102,7 +102,7 @@ def get_and_save_ad_data():
         logging.info(f'{ad_counter} saved so far')
 
         url = get_next_url(response)
-        if not url or loop_counter > 2:
+        if not url:
             break
 
     logging.info('No more pages found for results. Ending now.')
