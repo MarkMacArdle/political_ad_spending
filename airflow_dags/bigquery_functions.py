@@ -82,11 +82,16 @@ def load_data_into_table(client, staging_table):
     dir_name = 'ad_data'
     for filename in os.listdir(dir_name):
         rows = []
+        logging.info(f'Reading file: {filename}')
         with jsonlines.open(f'{dir_name}/{filename}') as reader:
             for obj in reader:
                 rows.append(obj)
 
-        errors = client.insert_rows(staging_table, rows)
+        # There's may be a json at the end with no rows so don't try upload
+        # that as it'll cause an error
+        if rows:
+            logging.info(f'Uploading file: {filename}')
+            errors = client.insert_rows(staging_table, rows)
 
         # Ignore errors. There enough data being inserted for them to not be
         # significant.
