@@ -12,6 +12,7 @@ from airflow.contrib.operators.gcs_to_bq import \
     GoogleCloudStorageToBigQueryOperator
 
 from bigquery_functions import get_ads_and_upload_to_bq_staging
+from config import supporting_docs_bucket_name
 from sql_queries import sql_ads_table, sql_spend_table, \
     sql_demographics_table, \
     sql_impressions_table, sql_regions_table, sql_transform_ons_table, \
@@ -60,6 +61,10 @@ get_ads_and_upload_to_staging = PythonOperator(
         'staging_table_name': staging_table_name,
     },
     dag=dag,
+
+    # creating dataset task will fail on second and subsequent runs but that's
+    # fine if it's already there
+    trigger_rule="all_done",
 )
 
 check_staging_table = BigQueryCheckOperator(
@@ -183,8 +188,8 @@ delete_staging = BigQueryTableDeleteOperator(
 
 load_guardian_fb_users_csv = GoogleCloudStorageToBigQueryOperator(
     task_id='load_guardian_fb_users_csv',
-    bucket='europe-west2-data-warehouse-6d0163ac-bucket',
-    source_objects=['dags/guardian_facebook_users_2018.csv'],
+    bucket=supporting_docs_bucket_name,
+    source_objects=['guardian_facebook_users_2018.csv'],
     skip_leading_rows=1,
     destination_project_dataset_table=(
         f'{dataset_name}.{guardian_fb_users_table_name}'
@@ -194,15 +199,17 @@ load_guardian_fb_users_csv = GoogleCloudStorageToBigQueryOperator(
         {'name': 'population', 'type': 'INTEGER', 'mode': 'NULLABLE'},
     ],
     write_disposition='WRITE_TRUNCATE',
-    dag=dag
+    dag=dag,
+
+    # creating dataset task will fail on second and subsequent runs but that's
+    # fine if it's already there
+    trigger_rule="all_done",
 )
 
 load_ons_uk_populations_csv = GoogleCloudStorageToBigQueryOperator(
     task_id='load_ons_uk_populations_csv',
-    bucket='europe-west2-data-warehouse-6d0163ac-bucket',
-    source_objects=[
-        'dags/ons_uk_population_estimates_from_2016_for_2019.csv'
-    ],
+    bucket=supporting_docs_bucket_name,
+    source_objects=['ons_uk_population_estimates_from_2016_for_2019.csv'],
     skip_leading_rows=1,
     destination_project_dataset_table=(
         f'{dataset_name}.{ons_uk_pops_table_name}'
@@ -213,7 +220,11 @@ load_ons_uk_populations_csv = GoogleCloudStorageToBigQueryOperator(
         {'name': 'population', 'type': 'INTEGER', 'mode': 'NULLABLE'},
     ],
     write_disposition='WRITE_TRUNCATE',
-    dag=dag
+    dag=dag,
+
+    # creating dataset task will fail on second and subsequent runs but that's
+    # fine if it's already there
+    trigger_rule="all_done",
 )
 
 transform_guardian = BigQueryOperator(

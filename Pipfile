@@ -7,7 +7,6 @@ verify_ssl = true
 
 [packages]
 requests = "*"
-facebook-sdk = "*"
 jsonlines = "*"
 python-dateutil = "*"
 google-cloud-bigquery = "*"

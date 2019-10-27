@@ -17,6 +17,7 @@ search_fields = [
 ]
 
 output_folder_name = 'ad_data'
+supporting_docs_bucket_name = 'facebook_political_ad_spending'
 
 # After you've registered as a developer and set up an app use the graph api
 # to get a new token:
@@ -26,4 +27,4 @@ output_folder_name = 'ad_data'
 #       https://developers.facebook.com/tools/debug/accesstoken
 # Helpful post on getting access tokens:
 #       https://medium.com/@DrGabrielA81/python-how-making-facebook-api-calls-using-facebook-sdk-ea18bec973c8#6fdb
-access_token = ''
+access_token = 'EAAPaWGvcZCGoBAFZC4znTYN33zTZA3yx38p5p6J66YPOeG8sZAG0VQUHgEJ8gRsoGIncKaZBacHxSexqfCzZCzx8LZBYcmcLoj0zREOIN8WA1UlEG9FPuZAoeZBk2I2MZB77j9R4ZCZAeWRZBZAeKgZBcnSl10ZAtufaS5jwr8H9BUjHIwaQtgZDZD'
