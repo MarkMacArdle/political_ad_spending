@@ -115,7 +115,6 @@ ORDER BY age
 
 Which gives results of:
 
-
 ```
 age     gbp_spent   spend_per_head_uk_population    spend_per_facebook_user
 13-17    4626.86      0.001                           0.0025
@@ -126,38 +125,3 @@ age     gbp_spent   spend_per_head_uk_population    spend_per_facebook_user
 55-64    68328.69     0.0084                          0.0195
 65+      57593.23     0.0046                          0.0199
 ```
-
-
-
-# Udacity Notes
-
-This was done as a capstone project for the data engineering nanodegree 
-course on Udacity and the below questions relate to that.
-
-Approach to this project under the following scenarios:
-
-The data was increased by 100x.
-
-- Currently when ads are downloaded from the API they're saved to the local 
-filesystem of the node running airflow before being uploaded to BigQuery. 
-This would be changed to saving to Google Cloud Storage.
-
-The pipelines would be run on a daily basis by 7 am every day.
-
-- This would be done by changing the `schedule_interval` DAG variable in 
-Airflow to a cron string of `0 7 * * *`. 
-- To avoid duplicates in the BigQuery tables an extra it would be useful to 
-add a step checking if ad's have an `ad_creation_time` since the last run 
-and only upload the new ones. Facebook unfortunately doesn't provide any way
-of filtering for ads updated in a date range so all ads would have to be 
-iterated over.
-
-The database needed to be accessed by 100+ people.
-
-- The database used, Google BigQuery, is able to handle huge scale so this 
-amount of users wouldn't be an issue. Depending on the environment an groups
-and roles with specific permissions may need to be created to make users 
-don't make unintended changes.
-
-
-
